@@ -71,14 +71,16 @@ class MouseOutputDriver:
             self.outport.write("\x87\x00\x00\x00\x00%s%s\x7f" % (chr(b6), chr(b7)))
             self.outport.flush() 
 
-class KeyboardOutputDriver:
+class XOutputDriver:
     def __init__(self, outport=None, multiplier=None):
         from xdo import Xdo, CURRENTWINDOW
         self.xdo = Xdo()
         self.CURRENTWINDOW = CURRENTWINDOW
+        self.multiplier = multiplier
 
+class XKeyboardOutputDriver(XOutputDriver):
     def sendkey(self, keysym):
-        self.xdo.send_keysequence_window(self.CURRENTWINDOW, keysym)
+        self.xdo.send_keysequence_window(self.CURRENTWINDOW.value, keysym)
 
     def scroll(self, delta, pressed):
         keysym = None
@@ -92,6 +94,20 @@ class KeyboardOutputDriver:
             for i in range(abs(delta)):
                 self.sendkey(keysym)
 
+class XMouseOutputDriver(XOutputDriver):
+    def click(self, button):
+        self.xdo.mouse_down(self.CURRENTWINDOW.value, button)
+        self.xdo.mouse_up(self.CURRENTWINDOW.value, button)
+
+    def press_multiple(self, button, amount):
+        for i in range(amount):
+            self.click(button)
+
+    def scroll(self, delta, pressed):
+        if delta < 0:
+            self.press_multiple(4, abs(delta) * (self.multiplier if pressed else 1))
+        elif delta > 0:
+            self.press_multiple(5, abs(delta) * (self.multiplier if pressed else 1))
 
 class WheelInputDriver:
     def __init__(self, inport):
@@ -120,7 +136,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Driver for Griffin PowerMate')
-    parser.add_argument('-d', '--driver',     nargs='?', choices=['mouse', 'keyboard', 'csv'], dest='driver',               default='mouse',       help='Output driver: mouse generates scroll events; keyboard generates key presses; csv generates CSV output to specified mouse_device path.')
+    parser.add_argument('-d', '--driver',     nargs='?', choices=['moused', 'xkeyboard', 'xmouse', 'csv'], dest='driver',               default='xkeyboard',       help='Output driver: "moused" generates scroll events for sysmouse protocol to be piped into moused; xkeyboard generates X11 key presses; xmouse generates X11 mouse wheel events; csv generates CSV output to specified mouse_device path.')
     parser.add_argument('-i', '--input',      nargs='?', metavar='wheel_device',               dest='inport',               default='/dev/uhid0',  help='The Griffin PowerMate device node. Defaults to "/dev/uhid0".')
     parser.add_argument('-o', '--output',     nargs='?', metavar='mouse_device',               dest='outport',              default='/dev/stdout', help='The mouse device node. The default is stdout, and is for piping into `moused -f -p /dev/stdin -t sysmouse -d -d`. If a non-existent path is specified then it is created as a fifo.')
     parser.add_argument('-m', '--multiplier', nargs='?', metavar='multiplier',                 dest='multiplier', type=int, default=32,            help='Multiplier to apply to mouse scroll events when the scroll wheel is pressed.')
@@ -137,9 +153,10 @@ def main():
     wheel = WheelInputDriver(open(args.inport, "a+b"))
 
     scroller = {
-        "mouse": MouseOutputDriver,
-        "keyboard": KeyboardOutputDriver,
-        "csv":      CSVOutputDriver,
+        "moused":        MouseOutputDriver,
+        "xkeyboard": XKeyboardOutputDriver,
+        "xmouse":       XMouseOutputDriver,
+        "csv":             CSVOutputDriver,
     }[args.driver](args.outport, args.multiplier)
 
     while True:
