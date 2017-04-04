@@ -13,6 +13,7 @@ Supports 4 output drivers:
 See `./scrollwheel.py -h` for usage information.
 
 ## Dependendies
-1. [python](https://python.org/)
-2. [python-libxdo](https://pypi.python.org/pypi/python-libxdo/)
-3. [libxdo from xdotool](https://github.com/jordansissel/xdotool)
+1. [Griffen PowerMate](https://www.amazon.com/Griffin-Technology-NA16029-Multimedia-Controller/dp/B003VWU2WA/)
+2. [python](https://python.org/)
+3. [python-libxdo](https://pypi.python.org/pypi/python-libxdo/)
+4. [libxdo from xdotool](https://github.com/jordansissel/xdotool)
