@@ -2,7 +2,7 @@
 Generic USB Driver for Griffin PowerMate on X11
 
 ## Summary
-This can drive your Griffen PowerMate on Linux and BSD operating systems, or any system with X11 and generic USB device nodes.
+This can drive your [Griffen PowerMate](https://www.amazon.com/Griffin-Technology-NA16029-Multimedia-Controller/dp/B003VWU2WA/) on Linux and BSD operating systems, or any system with X11 and generic USB device nodes.
 
 Supports 4 output drivers: 
 1. `moused`: "sysmouse" protocol scroll events, for piping into `moused`.
