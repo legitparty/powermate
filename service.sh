@@ -1,7 +1,7 @@
 #!/bin/sh
 case $1 in
 	start)
-		python scrollwheel.py -i "/dev/`dmesg | grep '^uhid.*Griffin' | cut -d: -f1`" > scrollwheel.pid
+		python2 scrollwheel.py -i "/dev/`dmesg | grep '^uhid.*Griffin' | cut -d: -f1`" > scrollwheel.pid
 		;;
 	stop)
 		kill `cat scrollwheel.pid`

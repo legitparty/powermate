@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #  ccw: ??01004f1000
 #   cw: ??ff004f1000
