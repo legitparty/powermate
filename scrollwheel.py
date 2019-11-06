@@ -128,7 +128,7 @@ class XMouseOutputDriver(XOutputDriver):
 class WheelInputDriver:
     def __init__(self, inport):
         self.inport = inport
-        self.inport.write("\x00")
+        #self.inport.write("\x00")
 
     def get_event(self):
         event = self.inport.read(6)
@@ -138,10 +138,11 @@ class WheelInputDriver:
             led     =   ord(event[3])
             return pressed, delta, led
         else:
-            return 0, 0
+            return 0, 0, 0
 
     def set_led(self, light):
-        self.inport.write(chr(int(((float(light) / 2) ** 2) * 255)))
+        pass
+        #self.inport.write(chr(int(((float(light) / 2) ** 2) * 255)))
 
 
 
