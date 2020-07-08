@@ -132,6 +132,7 @@ class WheelInputDriver:
 
     def get_event(self):
         event = self.inport.read(6)
+
         if event.endswith("\x10\x00"):
             pressed =   ord(event[0]) > 0
             delta   = ((ord(event[1]) + 128) % 256) - 128
@@ -178,7 +179,19 @@ def main():
     }[args.driver](args.outport, args.multiplier)
 
     while True:
-        pressed, delta, led = wheel.get_event()
+        from time import sleep
+        try:
+            pressed, delta, led = wheel.get_event()
+        except IOError:
+            sleep(2)
+            wheel = None
+            while not wheel:
+                try:
+                    wheel = WheelInputDriver(open(args.inport, "a+b"))
+                except IOError:
+                    wheel = None
+                    sleep(2)
+
         if args.debug:
             stderr.write("%s,%i,%i\r\n" % (pressed, delta, led))
             stderr.flush()
